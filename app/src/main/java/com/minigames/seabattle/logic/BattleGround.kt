@@ -1,6 +1,9 @@
 package at.fhooe.mc.android.battleships.logic
 
 import android.util.Log
+import com.minigames.seabattle.logic.CellState
+import com.minigames.seabattle.logic.Direction
+import com.minigames.seabattle.logic.Ship
 
 const val TAG = "SeaBattleLog"
 class BattleGround(var playerName: String, private val initAvailableShips: MutableMap<Int, Int>, private val tableSize: Int) {
@@ -35,7 +38,7 @@ class BattleGround(var playerName: String, private val initAvailableShips: Mutab
      * getter for gameStarted
      * @return gameStarted
      */
-    fun getGameStarted(): Boolean{
+    fun getGameState(): Boolean{
         return gameStarted
     }
 

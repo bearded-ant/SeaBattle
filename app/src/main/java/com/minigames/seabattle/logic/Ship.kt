@@ -1,4 +1,4 @@
-package at.fhooe.mc.android.battleships.logic
+package com.minigames.seabattle.logic
 
 class Ship(
     val startRow: Int,

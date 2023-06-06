@@ -1,4 +1,4 @@
-package at.fhooe.mc.android.battleships.logic
+package com.minigames.seabattle.logic
 
 enum class CellState {
     SHIP, SUNK, HIT, MISS, WATER, ERROR, SELECTED
