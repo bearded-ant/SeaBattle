@@ -182,9 +182,9 @@ class MainActivity : Activity() {
     }
 
     private fun initGame() {
-        rectSize = getScreenWidth() // Portrait Mode - width is limiting factor
-//        else
-//            windowManager.currentWindowMetrics.bounds.height() / tableSize // Landscape Mode - height is limiting factor
+        rectSize = getScreenWidth()/tableSize
+        val sss = ""
+//            windowManager.currentWindowMetrics.bounds.width() / tableSize // Landscape Mode - height is limiting factor
 
         battleGround1 =
             BattleGround(getString(R.string.battle_ground_player_1), initAvailableShips, tableSize)
