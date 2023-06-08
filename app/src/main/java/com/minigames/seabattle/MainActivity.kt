@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
+import android.view.View
 import android.view.WindowInsets
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
@@ -67,7 +68,8 @@ class MainActivity : Activity() {
         imageView.setImageDrawable(getDrawable(R.drawable.temcell))
         imageView.setOnClickListener {
             Toast.makeText(this, "$row :: $col", Toast.LENGTH_SHORT).show()
-            shakeImageView(imageView)
+//            shakeImageView(imageView)
+            shakeAnimation(imageView)
         }
 
         return imageView
@@ -90,14 +92,21 @@ class MainActivity : Activity() {
     }
 
     fun shakeImageView(imageView: ImageView) {
-        val shakeDuration = 100L // Длительность вздрагивания в миллисекундах
-        val shakeAngle = 5f // Угол вздрагивания в градусах
-        val shakeRepeatCount = 2 // Количество повторений вздрагивания
+        val shakeDuration = 150L // Длительность вздрагивания в миллисекундах
+        val shakeAngle = 15f // Угол вздрагивания в градусах
+        val shakeRepeatCount = 1 // Количество повторений вздрагивания
 
-        val shakeAnimator = ObjectAnimator.ofFloat(imageView, "rotation", -shakeAngle, shakeAngle)
+        val shakeAnimator = ObjectAnimator.ofFloat(imageView, "rotation", shakeAngle, -shakeAngle)
         shakeAnimator.interpolator = AccelerateDecelerateInterpolator()
         shakeAnimator.duration = shakeDuration
         shakeAnimator.repeatCount = shakeRepeatCount
         shakeAnimator.start()
+    }
+
+    fun shakeAnimation(view: View) {
+        val animator = ObjectAnimator.ofFloat(view, "rotation", 0f, -10f, 10f, 0f)
+        animator.interpolator = AccelerateDecelerateInterpolator()
+        animator.duration = 100
+        animator.start()
     }
 }
