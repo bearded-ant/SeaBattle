@@ -49,7 +49,7 @@ class MainActivity : Activity() {
     private fun drawBoard() {
         //Log.d(TAG, "MainActivity@${currentBattleGround.playerName}::drawBoard()")
 //            displayAvailableShips()
-        binding.activityMainTblBoard.removeAllViews()
+        binding.activityMainTblBotBoard.removeAllViews()
 //            binding.activityMainTvCurrentPlayer.text = currentBattleGround.playerName
         val layoutParams = TableRow.LayoutParams(rectSize, rectSize)
         for (i in 0 until tableSize) {
@@ -57,7 +57,7 @@ class MainActivity : Activity() {
             for (j in 0 until tableSize) {
                 tblRow.addView(cell2View(i, j), layoutParams)
             }
-            binding.activityMainTblBoard.addView(tblRow)
+            binding.activityMainTblBotBoard.addView(tblRow)
         }
     }
 
