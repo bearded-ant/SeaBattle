@@ -1,19 +1,21 @@
-package at.fhooe.mc.android.battleships.logic
+package com.minigames.seabattle.logic
 
 import android.util.Log
-import com.minigames.seabattle.logic.CellState
-import com.minigames.seabattle.logic.Direction
-import com.minigames.seabattle.logic.Ship
 
 const val TAG = "SeaBattleLog"
-class BattleGround(var playerName: String, private val initAvailableShips: MutableMap<Int, Int>, private val tableSize: Int) {
+
+class BattleGround(
+    var playerName: String,
+    private val initAvailableShips: MutableMap<Int, Int>,
+    private val tableSize: Int
+) {
     var playerBoard: Array<Array<Cell>> = Array(tableSize) {
         Array(tableSize) {
             Cell(CellState.WATER, null)
         }
     } // board of player
     private var availableShips: MutableMap<Int, Int> = mutableMapOf() // available ships
-    private var gameStarted: Boolean = false // flag for game state (see startGame)
+    private var gameStartedFlag: Boolean = false // flag for game state (see startGame)
 
     init {
         startGame(false)
@@ -30,16 +32,16 @@ class BattleGround(var playerName: String, private val initAvailableShips: Mutab
      */
     fun startGame(gameState: Boolean) {
         availableShips.putAll(initAvailableShips) // copy
-        gameStarted = gameState
-        Log.d(TAG, "BattleGround@$playerName::startGame() game state changed to $gameStarted")
+        gameStartedFlag = gameState
+        Log.d(TAG, "BattleGround@$playerName::startGame() game state changed to $gameStartedFlag")
     }
 
     /**
      * getter for gameStarted
      * @return gameStarted
      */
-    fun getGameState(): Boolean{
-        return gameStarted
+    fun getGameState(): Boolean {
+        return gameStartedFlag
     }
 
     /**
@@ -48,14 +50,20 @@ class BattleGround(var playerName: String, private val initAvailableShips: Mutab
      */
     fun setShip(ship: Ship): Boolean {
         Log.d(TAG, "BattleGround@$playerName::setShip() try to set ship onto playerBoard - $ship")
-        if (!gameStarted && availableShips.containsKey(ship.length) && availableShips[ship.length]!! > 0 && setShipChecks(ship)) {
+        if (!gameStartedFlag && availableShips.containsKey(ship.length) && availableShips[ship.length]!! > 0 && setShipChecks(
+                ship
+            )
+        ) {
             availableShips[ship.length] = availableShips[ship.length]!! - 1
             return iterateOverShip(ship) { row, col ->
                 playerBoard[row][col] = Cell(CellState.SHIP, ship)
                 return@iterateOverShip true
             }
         }
-        Log.d(TAG, "BattleGround@$playerName::setShip() ship not added (game started OR ship unavailable OR setShipChecks() failed)")
+        Log.d(
+            TAG,
+            "BattleGround@$playerName::setShip() ship not added (game started OR ship unavailable OR setShipChecks() failed)"
+        )
         return false
     }
 
@@ -70,7 +78,10 @@ class BattleGround(var playerName: String, private val initAvailableShips: Mutab
         return iterateOverShip(ship) { row, col ->
             var cell: Cell = playerBoard[row][col]
             if (cell.cellState == CellState.SHIP) {
-                Log.d(TAG, "BattleGround@$playerName::setShipChecks() already a ship desired position - $ship")
+                Log.d(
+                    TAG,
+                    "BattleGround@$playerName::setShipChecks() already a ship desired position - $ship"
+                )
                 return@iterateOverShip false
             }
             for (i in -1..1) {
@@ -81,7 +92,10 @@ class BattleGround(var playerName: String, private val initAvailableShips: Mutab
                         if (newI in 0 until tableSize && newJ in 0 until tableSize) {
                             cell = playerBoard[newI][newJ]
                             if (cell.cellState == CellState.SHIP) {
-                                Log.d(TAG, "BattleGround@$playerName::setShipChecks() ship is colliding with ${cell.ship}")
+                                Log.d(
+                                    TAG,
+                                    "BattleGround@$playerName::setShipChecks() ship is colliding with ${cell.ship}"
+                                )
                                 return@iterateOverShip false
                             }
                         }
@@ -98,9 +112,15 @@ class BattleGround(var playerName: String, private val initAvailableShips: Mutab
      * @return true if game not started, ship length is available; false if not removed
      */
     fun removeShip(ship: Ship): Boolean {
-        Log.d(TAG, "BattleGround@$playerName::removeShip() try to remove ship from playerBoard - $ship")
-        if (!gameStarted) {
-            if(playerBoard[ship.startRow][ship.endRow].cellState == CellState.SHIP && availableShips.containsKey(ship.length)) {
+        Log.d(
+            TAG,
+            "BattleGround@$playerName::removeShip() try to remove ship from playerBoard - $ship"
+        )
+        if (!gameStartedFlag) {
+            if (playerBoard[ship.startRow][ship.endRow].cellState == CellState.SHIP && availableShips.containsKey(
+                    ship.length
+                )
+            ) {
                 availableShips[ship.length] = availableShips[ship.length]!! + 1
             }
             return iterateOverShip(ship) { row, col ->
@@ -108,7 +128,10 @@ class BattleGround(var playerName: String, private val initAvailableShips: Mutab
                 return@iterateOverShip true
             }
         }
-        Log.d(TAG, "BattleGround@$playerName::removeShip() ship not removed (game started OR ship length was never available")
+        Log.d(
+            TAG,
+            "BattleGround@$playerName::removeShip() ship not removed (game started OR ship length was never available"
+        )
         return false
     }
 
@@ -133,7 +156,7 @@ class BattleGround(var playerName: String, private val initAvailableShips: Mutab
      */
     fun shoot(row: Int, col: Int): Cell {
         Log.d(TAG, "BattleGround@$playerName::shoot() shoot on $row/$col")
-        if (gameStarted) {
+        if (gameStartedFlag) {
             when (playerBoard[row][col].cellState) {
                 CellState.SHIP -> {
                     val cell = hitShip(row, col)
@@ -141,14 +164,19 @@ class BattleGround(var playerName: String, private val initAvailableShips: Mutab
                     Log.d(TAG, "BattleGround@$playerName::shoot() ${cell.cellState}")
                     return cell
                 }
+
                 CellState.WATER -> {
                     playerBoard[row][col] = Cell(CellState.MISS, null)
                     Log.d(TAG, "BattleGround@$playerName::shoot() ${CellState.MISS}")
                     return Cell(CellState.MISS, null)
                 }
+
                 else -> {
                     val cell = playerBoard[row][col]
-                    Log.d(TAG, "BattleGround@$playerName::shoot() shooting on this cell not possible ${cell.cellState}")
+                    Log.d(
+                        TAG,
+                        "BattleGround@$playerName::shoot() shooting on this cell not possible ${cell.cellState}"
+                    )
                     return cell
                 }
             }
@@ -188,8 +216,11 @@ class BattleGround(var playerName: String, private val initAvailableShips: Mutab
      */
     private fun iterateOverShip(ship: Ship, function: (Int, Int) -> Boolean): Boolean {
         if (ship.direction == Direction.HORIZONTAL) {
-            if (ship.startCol >= ship.endCol || ship.startRow != ship.endRow){
-                Log.d(TAG, "BattleGround@$playerName::iterateOverShip() startCol >= endCol OR startRow != endRow - $ship")
+            if (ship.startCol >= ship.endCol || ship.startRow != ship.endRow) {
+                Log.d(
+                    TAG,
+                    "BattleGround@$playerName::iterateOverShip() startCol >= endCol OR startRow != endRow - $ship"
+                )
                 return false
             }
             for (i in ship.startCol..ship.endCol) {
@@ -198,7 +229,10 @@ class BattleGround(var playerName: String, private val initAvailableShips: Mutab
             }
         } else if (ship.direction == Direction.VERTICAL) {
             if (ship.startRow >= ship.endRow || ship.startCol != ship.endCol) {
-                Log.d(TAG, "BattleGround@$playerName::iterateOverShip() startRow >= endRow OR startCol != endCol - $ship")
+                Log.d(
+                    TAG,
+                    "BattleGround@$playerName::iterateOverShip() startRow >= endRow OR startCol != endCol - $ship"
+                )
                 return false
             }
             for (i in ship.startRow..ship.endRow) {
@@ -207,5 +241,37 @@ class BattleGround(var playerName: String, private val initAvailableShips: Mutab
             }
         }
         return true
+    }
+
+    fun generateShips(availableShips: MutableMap<Int, Int>, playerBoard: Array<Array<Cell>>) {
+        //для всех доступных моделей кораблей
+        for (ship in availableShips) {
+            //для всех кораблей этой модели
+            for (i in 0..ship.value) {
+                //взять размер корабля и поместить его на поле
+                //выбрать рандомное направление
+                //выбрать ранодомный старт
+                // если все норм - разместить, если нет повторить выбор
+
+                val direction = (0..1).random()
+                val start: Pair<Int, Int> = Pair((0..10).random(), (0..10).random())
+            }
+        }
+    }
+
+    private fun spaceToPair(space: Int): Pair<Int, Int> {
+        val row = space / 10
+        val col = space % 10
+        return Pair(row, col)
+    }
+
+    private fun pairToSpace(pair: Pair<Int, Int>) = pair.first * 10 + pair.second
+
+    private fun availableCells(playerBoard: Array<Array<Cell>>) =
+        squareArray((playerBoard.indices).toList()).toMutableList()
+
+
+    private fun squareArray(array: List<Int>): List<Pair<Int, Int>> {
+        return array.flatMap { i -> array.map { j -> Pair(i, j) } }
     }
 }

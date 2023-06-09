@@ -1,7 +1,4 @@
-package at.fhooe.mc.android.battleships.logic
-
-import com.minigames.seabattle.logic.CellState
-import com.minigames.seabattle.logic.Ship
+package com.minigames.seabattle.logic
 
 class Cell(var cellState: CellState, var ship: Ship?) {
     /**
