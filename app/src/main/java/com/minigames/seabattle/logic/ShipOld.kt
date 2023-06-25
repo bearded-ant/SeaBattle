@@ -1,6 +1,6 @@
 package com.minigames.seabattle.logic
 
-class Ship(
+class ShipOld(
     val startRow: Int,
     val startCol: Int,
     var endRow: Int,
