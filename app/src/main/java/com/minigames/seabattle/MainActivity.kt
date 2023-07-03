@@ -77,7 +77,7 @@ class MainActivity : Activity() {
 
 //        --------------------------------
 
-    fun getScreenWidth(): Int {
+minim    private fun getScreenWidth(): Int {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             val windowMetrics = windowManager.currentWindowMetrics
             val insets: Insets = windowMetrics.windowInsets
@@ -97,7 +97,7 @@ class MainActivity : Activity() {
 //            binding.activityMainTvCurrentPlayer.text = currentBattleGround.playerName
         val layoutParams = TableRow.LayoutParams(rectSize, rectSize)
         for (i in 0 until tableSize) {
-            var tblRow = TableRow(this)
+            val tblRow = TableRow(this)
             for (j in 0 until tableSize) {
                 tblRow.addView(cell2View(i, j), layoutParams)
             }
