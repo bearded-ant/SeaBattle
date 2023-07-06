@@ -1,5 +1,6 @@
 package com.minigames.seabattle.algoritm
 
+import com.minigames.seabattle.model.Ship
 import kotlin.random.Random
 
 class GeneticAlgorithms(val boardSize: Int) {

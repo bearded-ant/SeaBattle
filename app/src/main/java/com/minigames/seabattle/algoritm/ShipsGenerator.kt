@@ -1,5 +1,6 @@
 package com.minigames.seabattle.algoritm
 
+import com.minigames.seabattle.model.Ship
 import kotlin.random.Random
 
 const val SHIP_MAX_SIZE = 4

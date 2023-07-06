@@ -1,6 +1,4 @@
-package com.minigames.seabattle.logic
-
-import com.minigames.seabattle.algoritm.Ship
+package com.minigames.seabattle.model
 
 class Cell(var cellState: CellState) {
 //    /**

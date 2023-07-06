@@ -1,4 +1,4 @@
-package com.minigames.seabattle.algoritm
+package com.minigames.seabattle.model
 
 data class Ship(
     var columnStart: Int,

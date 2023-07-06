@@ -1,7 +1,10 @@
 package com.minigames.seabattle.logic
 
 import android.util.Log
-import com.minigames.seabattle.algoritm.Ship
+import com.minigames.seabattle.model.Cell
+import com.minigames.seabattle.model.CellState
+import com.minigames.seabattle.model.Direction
+import com.minigames.seabattle.model.Ship
 
 const val TAG = "SeaBattleLog"
 

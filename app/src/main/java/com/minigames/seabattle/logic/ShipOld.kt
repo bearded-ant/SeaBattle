@@ -1,5 +1,7 @@
 package com.minigames.seabattle.logic
 
+import com.minigames.seabattle.model.Direction
+
 class ShipOld(
     val startRow: Int,
     val startCol: Int,

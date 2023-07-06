@@ -7,21 +7,20 @@ import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
-import android.util.Log
 import android.view.View
 import android.view.WindowInsets
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
 import android.widget.TableRow
+import androidx.appcompat.content.res.AppCompatResources
 import com.minigames.seabattle.algoritm.GeneticAlgorithms
-import com.minigames.seabattle.algoritm.Ship
+import com.minigames.seabattle.model.Ship
 import com.minigames.seabattle.algoritm.ShipsGenerator
 import com.minigames.seabattle.databinding.ActivityMainBinding
 import com.minigames.seabattle.logic.BattleGround
-import com.minigames.seabattle.logic.Cell
-import com.minigames.seabattle.logic.CellState
+import com.minigames.seabattle.model.Cell
+import com.minigames.seabattle.model.CellState
 import java.util.SortedMap
-import kotlin.system.measureTimeMillis
 
 const val BOARD_SIZE = 10
 const val POPULATION_SIZE = 200
@@ -44,40 +43,31 @@ class MainActivity : Activity() {
 
 
         rectSize = (getScreenWidth() - 180) / tableSize
-        Log.d("TAG", "onCreate: ${getScreenWidth()}")
 
-//------------------------------------
-        val executionTime = measureTimeMillis {
+        var population: SortedMap<Double, List<Ship>> =
+            createPopulation(playShips, POPULATION_SIZE)
 
+        var generationCount = 0
 
-            var population: SortedMap<Double, List<Ship>> =
-                createPopulation(playShips, POPULATION_SIZE)
-
-            var generationCount = 0
-
-            while (!population.containsKey(0.0)) {
-                val bestHalf = selectBestHalf(population)
-                val afterMutation = mutation(bestHalf)
-                population = createPopulation(playShips, POPULATION_SIZE - afterMutation.size)
-                population.putAll(afterMutation)
-                generationCount++
-            }
-            val winner = population.getValue(0.0)
-
-            val board = generator.cropToNormalSize(generator.shipsFitness(winner))
-            battleGround.setShip(winner, board)
-
-            drawBoard(winner)
+        while (!population.containsKey(0.0)) {
+            val bestHalf = selectBestHalf(population)
+            val afterMutation = mutation(bestHalf)
+            population = createPopulation(playShips, POPULATION_SIZE - afterMutation.size)
+            population.putAll(afterMutation)
+            generationCount++
         }
+        val winner = population.getValue(0.0)
 
-        Log.d("Time", "onCreate: $executionTime")
+        val board = generator.cropToNormalSize(generator.shipsFitness(winner))
+        battleGround.setShip(winner, board)
 
+        drawBoard(winner)
 
     }
 
 //        --------------------------------
 
-minim    private fun getScreenWidth(): Int {
+    private fun getScreenWidth(): Int {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             val windowMetrics = windowManager.currentWindowMetrics
             val insets: Insets = windowMetrics.windowInsets
@@ -121,17 +111,21 @@ minim    private fun getScreenWidth(): Int {
         return ImageView(this).apply {
             // drawable_cellstate = default drawable (border already set)
             // cellState2Color = CellState to color map
-            setImageDrawable((getDrawable(R.drawable.drawable_cellstate) as GradientDrawable).apply {
-                cellState2Color[cell.cellState]?.let { setColor(it) }
-            })
-//                setOnClickListener {
+            setImageDrawable(
+                (AppCompatResources.getDrawable(
+                    context,
+                    R.drawable.drawable_cellstate
+                ) as GradientDrawable).apply {
+                    cellState2Color[cell.cellState]?.let { setColor(it) }
+                })
+                setOnClickListener {
 //                    when (cell.cellState) {
 //                        CellState.SHIP -> cellStateShipClicked(row, col)
 //                        CellState.WATER -> cellStateWaterClicked(row, col)
 //                        CellState.ERROR -> cellStateErrorClicked()
 //                        else -> Log.d(TAG, "cell2View: error click")
 //                    }
-//                }
+                }
         }
     }
 
