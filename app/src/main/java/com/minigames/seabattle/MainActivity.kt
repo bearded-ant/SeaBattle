@@ -58,7 +58,7 @@ class MainActivity : Activity() {
         }
         val winner = population.getValue(0.0)
 
-        val board = generator.cropToNormalSize(generator.shipsFitness(winner))
+        val board = generator.cropToNormalSize(generator.placeShipsOnBoard(winner))
         battleGround.setShip(winner, board)
 
         drawBoard(winner)
@@ -148,8 +148,8 @@ class MainActivity : Activity() {
 
         while (population.size < populationSize && fitnessSum != 0.0) {
             val ships = generator.initShips(playShips)
-            val newBoard = generator.shipsFitness(ships)
-            fitnessSum = generator.getFitnessSum(newBoard)
+            val newBoard = generator.placeShipsOnBoard(ships)
+            fitnessSum = generator.getBoardPointsSum(newBoard)
 
             population[fitnessSum] = ships
         }
@@ -168,8 +168,8 @@ class MainActivity : Activity() {
                 geneticMutator.kPointCrossing(4, mather.toMutableList(), father.toMutableList())
 
             for (element in mutatePair.toList()) {
-                val newBoard = generator.shipsFitness(element)
-                val fitnessSum = generator.getFitnessSum(newBoard)
+                val newBoard = generator.placeShipsOnBoard(element)
+                val fitnessSum = generator.getBoardPointsSum(newBoard)
                 mutateHalf[fitnessSum] = element
                 if (fitnessSum == 0.0)
                     return mutateHalf.toSortedMap()

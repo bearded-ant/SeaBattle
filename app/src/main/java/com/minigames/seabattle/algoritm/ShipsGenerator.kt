@@ -1,16 +1,12 @@
 package com.minigames.seabattle.algoritm
 
+import com.minigames.seabattle.model.Config
 import com.minigames.seabattle.model.Ship
 import kotlin.random.Random
 
-const val SHIP_MAX_SIZE = 4
-const val OVER_SIZE_BOARD = SHIP_MAX_SIZE + 2
-
-const val OVER_SIZE_POINT = 1000.0
-const val LOCKED_CELL_POINT = 0.2
-const val SHIP_POINT = 1.0
-
 class ShipsGenerator(private val boardSize: Int) {
+
+    private val config = Config()
     fun initShips(shipsType: List<Int>): List<Ship> {
         val firstGenerationShips = mutableListOf<Ship>()
         for (ship in shipsType) {
@@ -22,14 +18,13 @@ class ShipsGenerator(private val boardSize: Int) {
         return firstGenerationShips
     }
 
-    fun initBoard(boardSize: Int): Array<DoubleArray> {
+    private fun initBoard(boardSize: Int): Array<DoubleArray> {
 
         val normalBoard = Array(boardSize) { DoubleArray(boardSize) }
 
         val oversizeBoard =
-            Array(boardSize + OVER_SIZE_BOARD) { DoubleArray(boardSize + OVER_SIZE_BOARD) { OVER_SIZE_POINT } }
+            Array(boardSize + config.OVER_SIZE_BOARD) { DoubleArray(boardSize + config.OVER_SIZE_BOARD) { config.OVER_SIZE_POINT } }
 
-        //добавляем значения рабочего поля на оверсайз доску
         for (i in 1..boardSize)
             for (j in 1..boardSize)
                 oversizeBoard[i][j] = normalBoard[i - 1][j - 1]
@@ -37,8 +32,7 @@ class ShipsGenerator(private val boardSize: Int) {
         return oversizeBoard
     }
 
-    //    fun shipsFitness(shipGeneration: List<Ship>, originalBoard: Array<DoubleArray>): Array<DoubleArray> {
-    fun shipsFitness(shipGeneration: List<Ship>): Array<DoubleArray> {
+    fun placeShipsOnBoard(shipGeneration: List<Ship>): Array<DoubleArray> {
         val board = initBoard(boardSize)
         for (ship in shipGeneration) {
             val resultMask = getShipMask(ship)
@@ -54,25 +48,27 @@ class ShipsGenerator(private val boardSize: Int) {
         return board
     }
 
-    fun getFitnessSum(board: Array<DoubleArray>): Double {
+    fun getBoardPointsSum(board: Array<DoubleArray>): Double {
         val normalBoardSum = board.sumOf { row ->
-            row.filter { selector -> SHIP_POINT < selector && selector < OVER_SIZE_POINT }.sum()
+            row.filter { selector -> config.SHIP_POINT < selector && selector < config.OVER_SIZE_POINT }
+                .sum()
         }
         val overSizeBoardSum = board.sumOf { row ->
-            row.filter { selector -> (OVER_SIZE_POINT + 4 * LOCKED_CELL_POINT) < selector }.sum()
+            row.filter { selector -> (config.OVER_SIZE_POINT + 4 * config.LOCKED_CELL_POINT) < selector }
+                .sum()
         }
-        return normalBoardSum + (overSizeBoardSum % OVER_SIZE_POINT)
+        return normalBoardSum + (overSizeBoardSum % config.OVER_SIZE_POINT)
     }
 
     private fun getShipMask(ship: Ship): Array<DoubleArray> {
-        val shipMask = DoubleArray(ship.length) { SHIP_POINT }
+        val shipMask = DoubleArray(ship.length) { config.SHIP_POINT }
         return if (ship.orientationVertical) {
-            val verticalShipMask = Array(ship.length + 2) { DoubleArray(3) { LOCKED_CELL_POINT } }
+            val verticalShipMask = Array(ship.length + 2) { DoubleArray(3) { config.LOCKED_CELL_POINT } }
             for (i in 1..shipMask.size)
                 verticalShipMask[i][1] = shipMask[i - 1]
             verticalShipMask
         } else {
-            val horizontalShipMask = Array(3) { DoubleArray(ship.length + 2) { LOCKED_CELL_POINT } }
+            val horizontalShipMask = Array(3) { DoubleArray(ship.length + 2) { config.LOCKED_CELL_POINT } }
             for (j in 1..shipMask.size)
                 horizontalShipMask[1][j] = shipMask[j - 1]
             horizontalShipMask
@@ -83,11 +79,11 @@ class ShipsGenerator(private val boardSize: Int) {
         for (i in 0..mask.lastIndex) {
             println()
             for (j in 0..mask[i].lastIndex)
-                if ((mask[i][j] > 1) && (mask[i][j] < OVER_SIZE_BOARD))
+                if ((mask[i][j] > 1) && (mask[i][j] < config.OVER_SIZE_BOARD))
                     print("\u001B[31m [${String.format("%.2f", mask[i][j])}] \u001B[0m")
                 else if (mask[i][j] in 1.0..1.8)
                     print("\u001B[32m [${String.format("%.2f", mask[i][j])}] \u001B[0m")
-                else if (mask[i][j] > (OVER_SIZE_POINT + 1))
+                else if (mask[i][j] > (config.OVER_SIZE_POINT + 1))
                     print("\u001B[31m [${String.format("%.2f", mask[i][j])}] \u001B[0m")
                 else print(" \u001B[37m ${String.format("%.2f", mask[i][j])}] \u001B[0m")
         }
@@ -98,7 +94,7 @@ class ShipsGenerator(private val boardSize: Int) {
 
     fun cropToNormalSize(oversize: Array<DoubleArray>): Array<DoubleArray> {
         val normalBoard = Array(boardSize) { DoubleArray(boardSize) }
-        val lastIndex = oversize.size - OVER_SIZE_BOARD
+        val lastIndex = oversize.size - config.OVER_SIZE_BOARD
         for ((cellCounter, i) in (1..lastIndex).withIndex()) {
             for ((rowCounter, j) in (1..lastIndex).withIndex()) {
                 normalBoard[cellCounter][rowCounter] = oversize[i][j]
