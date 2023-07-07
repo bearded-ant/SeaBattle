@@ -18,8 +18,7 @@ class GeneticAlgorithms(private val boardSize: Int) {
                 mutateShips[mutateShipIndex].rowStart = (1..boardSize).random()
                 mutateShips[mutateShipIndex].columnStart = (1..boardSize).random()
             } else
-                mutateShips[mutateShipIndex].orientationVertical =
-                    !mutateShips[mutateShipIndex].orientationVertical
+                mutateShips[mutateShipIndex].orientationVertical = !mutateShips[mutateShipIndex].orientationVertical
         }
         return mutateShips
     }
@@ -120,9 +119,9 @@ class GeneticAlgorithms(private val boardSize: Int) {
         return population.subMap(fromKey, toKey)
     }
 
-    private fun tournamentSelectionMutation(): List<Ship> {
+    fun tournamentSelectionMutation(playShips:List<Int>, populationSize: Int): List<Ship> {
         var population: SortedMap<Double, List<Ship>> =
-            createPopulation(config.playShips, config.POPULATION_SIZE)
+            createPopulation(playShips, populationSize)
 
         var generationCount = 0
 
@@ -130,7 +129,7 @@ class GeneticAlgorithms(private val boardSize: Int) {
             val bestHalf = selectBestHalf(population)
             val afterMutation = crossingMutation(bestHalf)
             population =
-                createPopulation(config.playShips, config.POPULATION_SIZE - afterMutation.size)
+                createPopulation(playShips, populationSize - afterMutation.size)
             population.putAll(afterMutation)
             generationCount++
         }

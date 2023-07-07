@@ -13,31 +13,51 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
 import android.widget.TableRow
 import androidx.appcompat.content.res.AppCompatResources
+import com.minigames.seabattle.algoritm.GeneticAlgorithms
+import com.minigames.seabattle.algoritm.ShipsGenerator
 import com.minigames.seabattle.databinding.ActivityMainBinding
 import com.minigames.seabattle.logic.BattleGround
 import com.minigames.seabattle.model.Cell
 import com.minigames.seabattle.model.CellState
 import com.minigames.seabattle.model.Config
-import com.minigames.seabattle.model.Ship
 
 
 class MainActivity : Activity() {
     private lateinit var binding: ActivityMainBinding
     private val config: Config = Config()
-    private val battleGround = BattleGround("Player", config.BOARD_SIZE)
-    private val rectSize = (getScreenWidth() - 180) / config.BOARD_SIZE
+    private val geneticAlgorithm = GeneticAlgorithms(config.BOARD_SIZE)
+    private val generator = ShipsGenerator(config.BOARD_SIZE)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val winner = ships()
+        val rectSize = (getScreenWidth() - 180) / config.BOARD_SIZE
 
-        val board = generator.cropToNormalSize(generator.placeShipsOnBoard(winner))
-        battleGround.setShip(winner, board)
+        val battleGround = BattleGround("Player", config.BOARD_SIZE)
+        var successfullyPlacedShips =
+            geneticAlgorithm.tournamentSelectionMutation(config.playShips, config.POPULATION_SIZE)
 
-        drawBoard(winner)
+        var board = generator.cropToNormalSize(generator.placeShipsOnBoard(successfullyPlacedShips))
+        battleGround.setShip(successfullyPlacedShips, board)
+
+        drawBoard(battleGround, rectSize)
+
+        binding.newGame.setOnClickListener {
+            val newBattleGround = BattleGround("Player", config.BOARD_SIZE)
+
+            successfullyPlacedShips =
+                geneticAlgorithm.tournamentSelectionMutation(
+                    config.playShips,
+                    config.POPULATION_SIZE
+                )
+
+            board = generator.cropToNormalSize(generator.placeShipsOnBoard(successfullyPlacedShips))
+            newBattleGround.setShip(successfullyPlacedShips, board)
+
+            drawBoard(newBattleGround, rectSize)
+        }
 
     }
 
@@ -54,7 +74,7 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun drawBoard(ships: List<Ship>) {
+    private fun drawBoard(battleGround: BattleGround, rectSize: Int) {
         //Log.d(TAG, "MainActivity@${currentBattleGround.playerName}::drawBoard()")
 //            displayAvailableShips()
         binding.activityMainTblBotBoard.removeAllViews()
@@ -63,13 +83,13 @@ class MainActivity : Activity() {
         for (i in 0 until config.BOARD_SIZE) {
             val tblRow = TableRow(this)
             for (j in 0 until config.BOARD_SIZE) {
-                tblRow.addView(cell2View(i, j), layoutParams)
+                tblRow.addView(cell2View(battleGround, i, j), layoutParams)
             }
             binding.activityMainTblBotBoard.addView(tblRow)
         }
     }
 
-    private fun cell2View(row: Int, col: Int): ImageView {
+    private fun cell2View(battleGround: BattleGround, row: Int, col: Int): ImageView {
         val cell: Cell = battleGround.playerBoard[row][col]
         val cellState2Color = initCellState2Color()
 //        val imageView: ImageView = ImageView(this)
